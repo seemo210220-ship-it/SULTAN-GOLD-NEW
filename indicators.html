@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SULTAN GOLD | Signals PRO</title>
+<style>
+:root{
+--bg:#031023;
+--panel:#071d35;
+--line:#205784;
+--cyan:#23c9ff;
+--muted:#a9c1dd;
+--green:#19d9ac;
+--red:#ff6675;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#f1f8ff;font-family:Tahoma,Arial,sans-serif}
+.wrap{max-width:1450px;margin:auto;padding:20px}
+.header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:18px}
+.brand{font-size:24px;font-weight:bold;color:var(--cyan)}
+a{color:var(--cyan);text-decoration:none}
+.subtitle{font-size:12px;color:var(--muted)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:18px}
+.controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+select,button{background:#092743;color:white;border:1px solid #2878ae;border-radius:8px;padding:11px;font:inherit}
+button{cursor:pointer}
+button:hover{background:#125184}
+.status{color:#ffcf77;font-size:12px;margin-top:12px;line-height:1.8}
+.chart{height:520px;width:100%;direction:ltr;margin-top:15px}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:15px}
+.card{border:1px solid var(--line);border-radius:10px;background:#06172c;padding:15px;text-align:center}
+.card small{display:block;color:var(--muted);margin-bottom:10px}
+.card strong{font-size:21px}
+.buy{color:var(--green)}
+.sell{color:var(--red)}
+.note{font-size:12px;color:var(--muted);line-height:1.9}
+@media(max-width:850px){
+.grid{grid-template-columns:repeat(2,1fr)}
+.chart{height:400px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="header">
+<div>
+<div class="brand">♛ SULTAN GOLD PRO</div>
+<div class="subtitle">GOLD EMA SIGNALS | H1 + M15</div>
+</div>
+<a href="index.html">العودة للرئيسية ↗️</a>
+</header>
+
+<section class="panel">
+<div class="controls">
+<strong>الذهب XAUUSD</strong>
+<select id="timeframe">
+<option value="15m">M15 — الدخول</option>
+<option value="1h">H1 — الاتجاه</option>
+</select>
+<button id="refresh">تحديث البيانات</button>
+</div>
+<div id="status" class="status">بانتظار بيانات السوق.</div>
+<div id="chart" class="chart"></div>
+</section>
+
+<section class="grid">
+<div class="card"><small>الإشارة</small><strong id="signal">WAIT</strong></div>
+<div class="card"><small>ENTRY</small><strong id="entry">—</strong></div>
+<div class="card"><small>STOP LOSS</small><strong id="sl">—</strong></div>
+<div class="card"><small>TP1</small><strong id="tp1">—</strong></div>
+<div class="card"><small>TP2 / TP3</small><strong id="tp23">—</strong></div>
+</section>
+
+<section class="panel note">
+<strong>منهج المؤشر:</strong>
+اتجاه الساعة H1 باستخدام EMA 9 وEMA 21،
+وتقاطع مؤكد على M15 في اتجاه الساعة.
+الوقف ATR 14 × 1.5، والأهداف 1R و2R و3R.
+<p>
+المستويات المعروضة تخص آخر إشارة تاريخية مؤكدة،
+وقد تكون منتهية أو تجاوزها السعر.
+المحتوى تعليمي وليس توصية مالية.
+</p>
+</section>
+</div>
+
+<script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+'use strict';
+
+const API_URL='/.netlify/functions/candles';
+const el=id=>document.getElementById(id);
+
+let chart=null;
+let candleSeries=null;
+let ema9Series=null;
+let ema21Series=null;
+
+function status(message){
+el('status').textContent=message;
+}
+
+function reset(){
+el('signal').textContent='WAIT';
+el('signal').className='';
+for(const id of ['entry','sl','tp1','tp23']){
+el(id).textContent='—';
+}
+}
+
+function ema(values,period){
+const out=[];
+let last=null;
+const k=2/(period+1);
+for(const v of values){
+last=last===null?v:v*k+last*(1-k);
+out.push(last);
+}
+return out;
+}
+
+function atr(candles,period=14){
+const out=[];
+let avg=0;
+for(let i=0;i<candles.length;i++){
+const c=candles[i];
+const prev=i?candles[i-1].close:c.close;
+const tr=Math.max(
+c.high-c.low,
+Math.abs(c.high-prev),
+Math.abs(c.low-prev)
+);
+if(i<period){
+avg+=tr;
+out.push(i===period-1?avg/period:null);
+if(i===period-1)avg/=period;
+}else{
+avg=(avg*(period-1)+tr)/period;
+out.push(avg);
+}
+}
+return out;
+}
+
+function normalize(raw){
+if(!Array.isArray(raw)){
+throw Error('صيغة البيانات غير صحيحة');
+}
+const data=raw.map(c=>{
+let time=Number(c.time);
+if(time>1e12)time=Math.floor(time/1000);
+const x={
+time,
+open:Number(c.open),
+high:Number(c.high),
+low:Number(c.low),
+close:Number(c.close)
+};
+if(
+!Object.values(x).every(Number.isFinite)||
+x.time<=0||
+x.high<Math.max(x.open,x.close)||
+x.low>Math.min(x.open,x.close)||
+x.low>x.high
+){
+throw Error('بيانات شموع غير صالحة');
+}
+return x;
+}).sort((a,b)=>a.time-b.time);
+
+for(let i=1;i<data.length;i++){
+if(data[i].time===data[i-1].time){
+throw Error('تكرار توقيت الشموع');
+}
+}
+return data;
+}
+
+async function getCandles(tf){
+const res=await fetch(
+`${API_URL}?symbol=XAUUSD&interval=${encodeURIComponent(tf)}`,
+{cache:'no-store'}
+);
+let body;
+try{
+body=await res.json();
+}catch{
+throw Error(`استجابة الخادم غير صالحة (${res.status})`);
+}
+if(!res.ok){
+throw Error(body.error||body.message||`فشل الاتصال (${res.status})`);
+}
+if(!Array.isArray(body.candles)){
+throw Error(body.error||'خدمة الشموع لم تُرجع بيانات');
+}
+return normalize(body.candles);
+}
+
+function createChart(){
+if(typeof LightweightCharts==='undefined'){
+throw Error('مكتبة الشارت لم تُحمّل');
+}
+if(chart)chart.remove();
+
+chart=LightweightCharts.createChart(el('chart'),{
+width:el('chart').clientWidth,
+height:el('chart').clientHeight,
+layout:{
+background:{color:'#071d35'},
+textColor:'#b8d8ee'
+},
+grid:{
+vertLines:{color:'#15334d'},
+horzLines:{color:'#15334d'}
+},
+timeScale:{
+timeVisible:true,
+secondsVisible:false
+},
+rightPriceScale:{
+borderColor:'#24527b'
+}
+});
+
+candleSeries=chart.addCandlestickSeries({
+upColor:'#19d9ac',
+downColor:'#ff6675',
+borderVisible:false,
+wickUpColor:'#19d9ac',
+wickDownColor:'#ff6675'
+});
+
+ema9Series=chart.addLineSeries({
+color:'#23c9ff',
+lineWidth:2,
+title:'EMA 9'
+});
+
+ema21Series=chart.addLineSeries({
+color:'#e6b961',
+lineWidth:2,
+title:'EMA 21'
+});
+}
+
+function lastConfirmedSignal(m15,h1){
+if(m15.length<50||h1.length<30)return null;
+
+const mf=ema(m15.map(c=>c.close),9);
+const ms=ema(m15.map(c=>c.close),21);
+const hf=ema(h1.map(c=>c.close),9);
+const hs=ema(h1.map(c=>c.close),21);
+const ranges=atr(m15);
+
+let j=0;
+let last=null;
+
+for(let i=1;i<m15.length;i++){
+const t=m15[i].time;
+
+while(
+j+1<h1.length &&
+h1[j+1].time+3600<=t
+)j++;
+
+if(h1[j].time+3600>t)continue;
+
+const buy=
+mf[i]>ms[i] &&
+mf[i-1]<=ms[i-1] &&
+hf[j]>hs[j];
+
+const sell=
+mf[i]<ms[i] &&
+mf[i-1]>=ms[i-1] &&
+hf[j]<hs[j];
+
+if(!(buy||sell)||!(ranges[i]>0))continue;
+
+const side=buy?'BUY':'SELL';
+const dir=buy?1:-1;
+const entry=m15[i].close;
+const risk=ranges[i]*1.5;
+
+last={
+side,
+entry,
+sl:entry-dir*risk,
+tp1:entry+dir*risk,
+tp2:entry+dir*2*risk,
+tp3:entry+dir*3*risk,
+time:t
+};
+}
+return last;
+}
+
+function levels(result){
+const colors={
+ENTRY:'#23c9ff',
+SL:'#ff6675',
+TP1:'#19d9ac',
+TP2:'#19d9ac',
+TP3:'#19d9ac'
+};
+
+const values={
+ENTRY:result.entry,
+SL:result.sl,
+TP1:result.tp1,
+TP2:result.tp2,
+TP3:result.tp3
+};
+
+for(const [name,value] of Object.entries(values)){
+candleSeries.createPriceLine({
+price:value,
+color:colors[name],
+lineWidth:name==='ENTRY'?2:1,
+lineStyle:LightweightCharts.LineStyle.Dashed,
+axisLabelVisible:true,
+title:`${name} ${value.toFixed(2)}`
+});
+}
+}
+
+function show(result){
+reset();
+if(!result)return;
+
+el('signal').textContent=result.side;
+el('signal').className=result.side==='BUY'?'buy':'sell';
+
+el('entry').textContent=result.entry.toFixed(2);
+el('sl').textContent=result.sl.toFixed(2);
+el('tp1').textContent=result.tp1.toFixed(2);
+el('tp23').textContent=
+`${result.tp2.toFixed(2)} / ${result.tp3.toFixed(2)}`;
+}
+
+let requestId=0;
+
+async function load(){
+const id=++requestId;
+reset();
+status('جارٍ طلب بيانات السوق...');
+
+try{
+const [m15,h1]=await Promise.all([
+getCandles('15m'),
+getCandles('1h')
+]);
+
+if(id!==requestId)return;
+
+if(m15.length<50||h1.length<30){
+throw Error('عدد الشموع غير كافٍ');
+}
+
+const tf=el('timeframe').value;
+const candles=tf==='1h'?h1:m15;
+
+createChart();
+candleSeries.setData(candles);
+
+const f=ema(candles.map(c=>c.close),9);
+const s=ema(candles.map(c=>c.close),21);
+
+ema9Series.setData(candles.map((c,i)=>({
+time:c.time,
+value:f[i]
+})));
+
+ema21Series.setData(candles.map((c,i)=>({
+time:c.time,
+value:s[i]
+})));
+
+const result=lastConfirmedSignal(m15,h1);
+
+if(result){
+levels(result);
+
+if(tf==='15m'){
+candleSeries.setMarkers([{
+time:result.time,
+position:result.side==='BUY'?'belowBar':'aboveBar',
+color:result.side==='BUY'?'#19d9ac':'#ff6675',
+shape:result.side==='BUY'?'arrowUp':'arrowDown',
+text:result.side
+}]);
+}
+}
+
+show(result);
+chart.timeScale().fitContent();
+
+status(
+result
+?'آخر إشارة تاريخية مؤكدة مع مستوياتها — ليست بالضرورة فرصة دخول حالية.'
+:'تم تحميل الشموع، ولا توجد إشارة مؤكدة ضمن البيانات المتاحة.'
+);
+
+}catch(e){
+if(id!==requestId)return;
+status('تعذر تشغيل المؤشر: '+e.message);
+}
+}
+
+el('refresh').addEventListener('click',load);
+el('timeframe').addEventListener('change',load);
+
+window.addEventListener('resize',()=>{
+if(chart){
+chart.applyOptions({
+width:el('chart').clientWidth,
+height:el('chart').clientHeight
+});
+}
+});
+
+reset();
+load();
+</script>
+</body>
+</html>

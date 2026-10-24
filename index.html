@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SULTAN GOLD PRO | Intelligent Trading Platform</title>
+<style>
+:root{
+--bg:#031023;
+--panel:#061b32;
+--line:#175080;
+--cyan:#23c9ff;
+--muted:#a9c1dd;
+--gold:#e6b961;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+margin:0;
+background:var(--bg);
+color:#f1f8ff;
+font-family:Tahoma,Arial,sans-serif;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:1440px;margin:auto;padding:0 24px}
+.top{
+border-bottom:1px solid #236396;
+background:#031022;
+}
+.nav{
+min-height:70px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:20px;
+flex-wrap:wrap;
+}
+.brand{
+font-size:24px;
+letter-spacing:1px;
+color:#61d7ff;
+font-weight:800;
+direction:ltr;
+}
+.brand small,.crown{color:var(--gold)}
+.brand-sub{
+font-size:9px;
+color:#9fb5cb;
+letter-spacing:3px;
+text-align:left;
+}
+.navlinks{
+display:flex;
+align-items:center;
+gap:24px;
+font-size:13px;
+flex-wrap:wrap;
+}
+.navlinks a:hover{color:var(--cyan)}
+.lang{
+border:1px solid #1975b9;
+border-radius:30px;
+background:transparent;
+color:#c8e9ff;
+padding:9px 16px;
+}
+.ticker{
+display:grid;
+grid-template-columns:repeat(6,minmax(0,1fr));
+gap:9px;
+padding:10px 0;
+}
+.tick{
+border:1px solid #205787;
+background:#051a31;
+border-radius:12px;
+padding:11px;
+direction:ltr;
+}
+.tick .sym{font-size:13px;font-weight:bold}
+.tick .meta{font-size:10px;color:#91a7c5}
+.tick .price{
+font-size:18px;
+margin:7px 0;
+font-weight:bold;
+}
+.tick .change{font-size:11px;color:#28d99b}
+.tick.down .change{color:#ff6675}
+.tick .emoji{font-size:22px;float:left}
+
+/* HERO — النص يسار والثور يمين */
+.hero{
+min-height:390px;
+position:relative;
+overflow:hidden;
+border-block:1px solid #194c7d;
+background:linear-gradient(90deg,#031123,#05213e);
+isolation:isolate;
+}
+.bull{
+position:absolute;
+right:0;
+left:auto;
+top:0;
+width:56%;
+height:100%;
+object-fit:cover;
+object-position:center;
+mask-image:linear-gradient(to right,transparent,black 35%);
+-webkit-mask-image:linear-gradient(to right,transparent,black 35%);
+z-index:0;
+}
+.hero:after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(
+90deg,
+#031123 0%,
+#031123e8 25%,
+#03112380 49%,
+transparent 72%
+);
+pointer-events:none;
+z-index:0;
+}
+.hero-inner{
+position:relative;
+z-index:1;
+min-height:390px;
+display:flex;
+align-items:center;
+justify-content:flex-start;
+direction:ltr;
+}
+.hero-copy{
+width:min(510px,48%);
+direction:rtl;
+text-align:center;
+padding:30px 0;
+flex-shrink:0;
+}
+.eyebrow{
+letter-spacing:5px;
+font-size:11px;
+color:#c4d7f1;
+}
+.hero h1{
+font-size:clamp(30px,3.5vw,49px);
+line-height:1.35;
+margin:13px 0;
+}
+.hero h1 b{color:var(--cyan)}
+.hero p{
+font-size:17px;
+color:#b8cbe2;
+line-height:1.8;
+}
+.actions{
+display:flex;
+justify-content:center;
+gap:12px;
+flex-wrap:wrap;
+}
+.btn{
+border:1px solid #128ae4;
+border-radius:8px;
+padding:13px 22px;
+background:#061b32;
+color:#3cd9ff;
+font-weight:bold;
+}
+.btn.primary{
+background:#078bfa;
+color:white;
+box-shadow:0 0 16px #078bfa77;
+}
+.section{margin:18px 0 28px}
+.chartbox{
+border:1px solid #2777b2;
+border-radius:13px;
+background:#031425;
+overflow:hidden;
+}
+.charthead{
+padding:12px 17px;
+border-bottom:1px solid #235480;
+display:flex;
+justify-content:space-between;
+gap:12px;
+flex-wrap:wrap;
+font-size:13px;
+}
+.charthead strong{color:#5bd8ff}
+.chartarea{
+height:270px;
+position:relative;
+overflow:hidden;
+background:
+repeating-linear-gradient(
+to right,transparent 0,
+transparent 118px,#ffffff0c 119px,#ffffff0c 120px
+),
+repeating-linear-gradient(
+to bottom,transparent 0,
+transparent 52px,#ffffff0d 53px,#ffffff0d 54px
+);
+}
+.chartarea svg{width:100%;height:100%}
+.demo{
+position:absolute;
+left:12px;
+top:10px;
+background:#153958ed;
+border:1px solid #397ca6;
+border-radius:7px;
+padding:5px 9px;
+font-size:11px;
+color:#cdeaff;
+z-index:2;
+}
+.bottom{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:24px;
+}
+.sectitle{
+font-size:21px;
+font-weight:bold;
+margin:7px 0;
+}
+.sectitle span{color:#25c9ff}
+.sub{
+font-size:12px;
+color:#94b3d0;
+margin-bottom:14px;
+}
+.marketgrid,.featuregrid{
+display:grid;
+grid-template-columns:repeat(3,minmax(0,1fr));
+gap:9px;
+}
+.market,.feature{
+background:linear-gradient(145deg,#09233f,#041426);
+border:1px solid #205784;
+border-radius:10px;
+padding:14px;
+}
+.market .big{font-size:23px}
+.market strong{display:block;margin:6px 0}
+.market small{color:#8da8c5}
+.feature{
+text-align:center;
+min-height:152px;
+}
+.feature .ic{
+font-size:28px;
+color:#28c9ff;
+}
+.feature strong{
+display:block;
+margin:8px 0;
+font-size:12px;
+}
+.feature p{
+font-size:11px;
+line-height:1.6;
+color:#adc3da;
+}
+.feature a{
+display:inline-block;
+border:1px solid #235c8c;
+border-radius:7px;
+padding:7px 10px;
+color:#69d8ff;
+font-size:11px;
+}
+.notice{
+color:#8fa9c3;
+font-size:11px;
+text-align:center;
+padding:25px;
+border-top:1px solid #18466d;
+margin-top:25px;
+}
+body.en{direction:ltr}
+body.en .hero-copy{direction:ltr}
+
+/* شاشات التابلت */
+@media(max-width:950px){
+.ticker{grid-template-columns:repeat(3,1fr)}
+.bottom{grid-template-columns:1fr}
+.hero .bull{
+width:55%;
+opacity:.85;
+}
+.hero-copy{
+width:52%;
+}
+.hero-inner{
+justify-content:flex-start;
+}
+.hero:after{
+background:linear-gradient(
+90deg,
+#031123 0%,
+#031123d9 36%,
+transparent 80%
+);
+}
+}
+
+/* الجوال */
+@media(max-width:560px){
+.wrap{padding:0 12px}
+.nav{
+justify-content:center;
+padding:12px 0;
+}
+.navlinks{
+justify-content:center;
+gap:13px;
+}
+.ticker{grid-template-columns:repeat(2,1fr)}
+.marketgrid,.featuregrid{
+grid-template-columns:repeat(2,1fr);
+}
+.hero,.hero-inner{min-height:440px}
+.hero .bull{
+width:100%;
+height:100%;
+opacity:.38;
+object-position:65% center;
+}
+.hero:after{
+background:linear-gradient(
+90deg,
+#031123dd,
+#03112399
+);
+}
+.hero-inner{
+justify-content:center;
+}
+.hero-copy{
+width:100%;
+max-width:420px;
+background:#03112366;
+border-radius:16px;
+padding:24px 12px;
+}
+.hero h1{font-size:31px}
+.chartarea{height:230px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+<div class="wrap nav">
+<div class="brand">
+<span class="crown">♛</span> SULTAN GOLD
+<small>PRO</small>
+<div class="brand-sub">
+INTELLIGENT TRADING PLATFORM
+</div>
+</div>
+
+<nav class="navlinks">
+<a href="#home" data-ar="الرئيسية" data-en="Home">الرئيسية</a>
+<a href="#markets" data-ar="الأسواق" data-en="Markets">الأسواق</a>
+<a href="#tools" data-ar="المؤشرات والأدوات" data-en="Indicators & Tools">المؤشرات والأدوات</a>
+<a href="#plans" data-ar="الاشتراكات" data-en="Plans">الاشتراكات</a>
+<a href="#tools" data-ar="الذكاء الاصطناعي" data-en="AI">الذكاء الاصطناعي</a>
+<a href="https://t.me/sultanGold0" target="_blank" rel="noopener" data-ar="تواصل معنا" data-en="Contact">تواصل معنا</a>
+</nav>
+
+<button class="lang" id="language">🌐 English</button>
+</div>
+</header>
+
+<div class="wrap">
+<div class="ticker" id="ticker"></div>
+</div>
+
+<section class="hero" id="home">
+<img class="bull" src="sultan-bull.jpg" alt="SULTAN GOLD Bull">
+
+<div class="wrap hero-inner">
+<div class="hero-copy">
+<div class="eyebrow">SULTAN GOLD INTELLIGENCE</div>
+<h1 data-ar="مستقبل التحليل المالي يبدأ مع SULTAN GOLD"
+data-en="The future of financial analysis starts with SULTAN GOLD">
+مستقبل التحليل المالي يبدأ مع
+<b>SULTAN GOLD</b>
+</h1>
+
+<p data-ar="منصة تجمع التعليم والتحليل الفني والمؤشرات والاستراتيجيات والروبوتات والخوارزميات في تجربة واحدة متطورة."
+data-en="A platform for education, technical analysis, indicators, strategies, bots and algorithms.">
+منصة تجمع التعليم والتحليل الفني والمؤشرات والاستراتيجيات والروبوتات والخوارزميات في تجربة واحدة متطورة.
+</p>
+
+<div class="actions">
+<a class="btn primary" href="#tools"
+data-ar="استكشف المنصة ↗️"
+data-en="Explore platform ↗️">استكشف المنصة ↗️</a>
+
+<a class="btn" href="#chart"
+data-ar="المؤشرات الفنية 📈"
+data-en="Technical indicators 📈">المؤشرات الفنية 📈</a>
+</div>
+</div>
+</div>
+</section>
+
+<main class="wrap">
+
+<section class="section chartbox" id="chart">
+<div class="charthead">
+<strong>📈 SULTAN GOLD | GOLD EMA SIGNALS PRO</strong>
+<span data-ar="إشارات التداول — الدخول والأهداف ووقف الخسارة"
+data-en="Trading signals — Entry, targets and stop loss">
+إشارات التداول — الدخول والأهداف ووقف الخسارة
+</span>
+</div>
+<div class="chartarea">
+<span class="demo">رسم توضيحي — ليس بيانات سوق حية</span>
+<svg id="chartSvg" viewBox="0 0 1200 270"
+preserveAspectRatio="none"></svg>
+</div>
+</section>
+
+<div class="bottom">
+
+<section id="tools">
+<div class="sectitle">
+⚙️ منظومة <span>SULTAN GOLD</span> الذكية
+</div>
+<div class="sub">
+أدوات تحليلية وتقنية نطورها تدريجيًا
+</div>
+
+<div class="featuregrid">
+<div class="feature">
+<div class="ic">▥</div>
+<strong>المؤشرات الفنية</strong>
+<p>EMA وإشارات الدخول والأهداف</p>
+<a href="#chart">عرض تجريبي</a>
+</div>
+
+<div class="feature">
+<div class="ic">🤖</div>
+<strong>روبوتات التداول</strong>
+<p>تنفيذ آلي وحماية رأس المال</p>
+<a href="#plans">قيد التطوير</a>
+</div>
+
+<div class="feature">
+<div class="ic">🧠</div>
+<strong>الذكاء الاصطناعي</strong>
+<p>دراسة الاتجاهات والأسواق</p>
+<a href="#plans">قيد التطوير</a>
+</div>
+
+<div class="feature">
+<div class="ic">📈</div>
+<strong>الاستراتيجيات</strong>
+<p>قواعد الدخول وإدارة المخاطر</p>
+<a href="#plans">قيد التطوير</a>
+</div>
+
+<div class="feature">
+<div class="ic">⚙️</div>
+<strong>الخوارزميات</strong>
+<p>أنظمة تقييم فرص السوق</p>
+<a href="#plans">قيد التطوير</a>
+</div>
+
+<div class="feature">
+<div class="ic">🎓</div>
+<strong>الأكاديمية التعليمية</strong>
+<p>تعليم التحليل الفني</p>
+<a href="#plans">قيد التطوير</a>
+</div>
+</div>
+</section>
+
+<section id="markets">
+<div class="sectitle">
+🌐 <span>الأسواق</span> المالية
+</div>
+<div class="sub">
+استعراض الأسواق — ربط الأسعار الحية لاحقًا
+</div>
+<div class="marketgrid" id="marketsGrid"></div>
+</section>
+
+</div>
+
+<section id="plans" class="section">
+<div class="sectitle">✦ <span>الاشتراكات</span></div>
+<p style="color:#a6c3de">
+FREE · PRO · PREMIUM — قريبًا بعد اختبار الخدمات والتأكد من استقرارها.
+</p>
+</section>
+
+</main>
+
+<footer class="notice">
+SULTAN GOLD PRO ©️ 2026 —
+محتوى تعليمي وليس توصية استثمارية.
+الأسعار المعروضة تجريبية وليست حية.
+<a href="https://t.me/sultanGold0">t.me/sultanGold0</a>
+</footer>
+
+<script>
+const assets=[
+["🪙","GOLD","XAUUSD","2392.45"],
+["🇪🇺","EURUSD","EURUSD","1.0842"],
+["🇬🇧","GBPUSD","GBPUSD","1.2685"],
+["🇺🇸","US100","US100","18524.6"],
+["₿","BTCUSD","BTCUSD","67842.1"],
+["🛢️","OIL","OIL","79.32"]
+];
+
+const spark=`
+<svg viewBox="0 0 70 22" width="65" height="22">
+<polyline fill="none" stroke="#19d9ac"
+stroke-width="2"
+points="0,18 8,14 15,16 23,8 30,11 39,6 48,9 57,4 70,2"/>
+</svg>`;
+
+document.getElementById("ticker").innerHTML=
+assets.map((a,i)=>`
+<div class="tick ${i===1||i===4?"down":""}">
+<span class="emoji">${a[0]}</span>
+<div class="sym">${a[1]}</div>
+<div class="meta">${a[2]}</div>
+<div class="price">${a[3]}</div>
+<div class="change">
+${i===1||i===4?"−0.10%":"+0.22%"} ${spark}
+</div>
+</div>`).join("");
+
+document.getElementById("marketsGrid").innerHTML=
+assets.map(a=>`
+<div class="market">
+<span class="big">${a[0]}</span>
+<strong>${a[1]}</strong>
+<small>${a[2]}</small>
+<div style="margin-top:10px;font-weight:bold">
+${a[3]}
+</div>
+<div style="color:#19d9ac;font-size:11px">
+${spark}
+</div>
+</div>`).join("");
+
+const svg=document.getElementById("chartSvg");
+let seed=23;
+function rand(){
+seed=(seed*16807)%2147483647;
+return(seed%1000)/1000;
+}
+
+let price=160;
+let ma=160;
+let ma2=160;
+let out="";
+let fastPoints=[];
+let slowPoints=[];
+
+for(let i=0;i<105;i++){
+let x=12+i*11.3;
+let prev=price;
+price=Math.max(40,Math.min(225,
+price+(rand()-.47)*20));
+
+ma=ma*.86+price*.14;
+ma2=ma2*.95+price*.05;
+
+let y=Math.min(prev,price);
+let h=Math.max(2,Math.abs(price-prev));
+let color=price<prev?"#12cba9":"#ef526b";
+
+out+=`
+<line x1="${x+3}" y1="${y-6}"
+x2="${x+3}" y2="${y+h+7}"
+stroke="${color}" stroke-width="1"/>
+<rect x="${x}" y="${y}"
+width="6" height="${h}"
+fill="${color}"/>`;
+
+fastPoints.push(`${x+3},${ma}`);
+slowPoints.push(`${x+3},${ma2}`);
+}
+
+out+=`
+<polyline points="${fastPoints.join(" ")}"
+fill="none" stroke="#21d9e7"
+stroke-width="2"/>
+<polyline points="${slowPoints.join(" ")}"
+fill="none" stroke="#f5c542"
+stroke-width="2"/>`;
+
+out+=`
+<rect x="790" y="38" width="58" height="25"
+rx="4" fill="#f04455"/>
+<text x="819" y="55" text-anchor="middle"
+fill="white" font-size="14">SELL</text>
+<path d="M819 65 L819 86" stroke="#f04455"
+stroke-width="4"/>
+<path d="M811 80 L819 91 L827 80"
+fill="#f04455"/>
+
+<rect x="910" y="187" width="54" height="25"
+rx="4" fill="#12b981"/>
+<text x="937" y="204" text-anchor="middle"
+fill="white" font-size="14">BUY</text>
+<path d="M937 183 L937 160"
+stroke="#12b981" stroke-width="4"/>
+<path d="M929 168 L937 156 L945 168"
+fill="#12b981"/>`;
+
+svg.innerHTML=out;
+
+document.getElementById("language")
+.addEventListener("click",()=>{
+const en=document.body.classList.toggle("en");
+document.documentElement.lang=en?"en":"ar";
+document.documentElement.dir=en?"ltr":"rtl";
+document.querySelectorAll("[data-ar][data-en]")
+.forEach(el=>{
+el.textContent=en?el.dataset.en:el.dataset.ar;
+});
+document.getElementById("language").textContent=
+en?"🌐 العربية":"🌐 English";
+});
+</script>
+</body>
+</html>
