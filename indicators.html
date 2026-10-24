@@ -148,7 +148,7 @@ if(!Array.isArray(raw)){
 throw Error('صيغة البيانات غير صحيحة');
 }
 const data=raw.map(c=>{
-let time=Number(c.time);
+let time = Math.floor(Date.parse(c.datetime.replace(' ', 'T') + 'Z') / 1000);
 if(time>1e12)time=Math.floor(time/1000);
 const x={
 time,
