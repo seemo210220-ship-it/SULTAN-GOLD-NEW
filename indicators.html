@@ -1,585 +1,3 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#031023">
-<title>SULTAN GOLD PRO | Multi Market Signals</title>
-
-<style>
-:root{
-  --bg:#031023;
-  --panel:#071d35;
-  --line:#205784;
-  --cyan:#23c9ff;
-  --muted:#a9c1dd;
-  --green:#19d9ac;
-  --red:#ff6675;
-  --gold:#e6b961;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:#f1f8ff;
-  font-family:Tahoma,Arial,sans-serif;
-}
-.wrap{max-width:1450px;margin:auto;padding:20px}
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  flex-wrap:wrap;
-  border-bottom:1px solid var(--line);
-  padding-bottom:18px;
-}
-.brand{font-size:24px;font-weight:bold;color:var(--cyan)}
-.subtitle{font-size:12px;color:var(--muted);margin-top:5px}
-a{color:var(--cyan);text-decoration:none}
-.panel{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:16px;
-  margin-top:18px;
-}
-h2{font-size:18px;color:var(--cyan);margin:0 0 15px}
-.searchbar{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-input,select,button{
-  background:#092743;
-  color:white;
-  border:1px solid #2878ae;
-  border-radius:8px;
-  padding:12px;
-  font:inherit;
-}
-input{flex:1;min-width:180px;direction:ltr;text-align:left}
-button{cursor:pointer}
-button:hover{background:#125184}
-button:disabled{opacity:.5;cursor:not-allowed}
-.primary{background:#0877df;border-color:#23c9ff}
-.quick{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:15px;
-}
-.quick button{
-  padding:9px 13px;
-  font-size:12px;
-}
-.quick button.active{
-  background:#1260a0;
-  border-color:var(--cyan);
-  color:white;
-}
-.controls{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.symbol-name{color:var(--cyan);font-size:19px}
-.status{
-  color:#ffcf77;
-  font-size:13px;
-  margin-top:12px;
-  line-height:1.9;
-  white-space:pre-line;
-}
-.info{
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.9;
-  margin-top:8px;
-}
-.chart{
-  height:520px;
-  width:100%;
-  direction:ltr;
-  margin-top:15px;
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:10px;
-  margin-top:15px;
-}
-.card{
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#06172c;
-  padding:15px;
-  text-align:center;
-  min-width:0;
-}
-.card small{
-  display:block;
-  color:var(--muted);
-  margin-bottom:10px;
-}
-.card strong{
-  display:block;
-  font-size:20px;
-  overflow-wrap:anywhere;
-}
-.buy{color:var(--green)}
-.sell{color:var(--red)}
-.wait{color:var(--gold)}
-.note{
-  font-size:12px;
-  color:var(--muted);
-  line-height:2;
-}
-.footer{
-  color:var(--muted);
-  text-align:center;
-  padding:20px;
-  font-size:12px;
-}
-@media(max-width:850px){
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .chart{height:430px}
-  .wrap{padding:12px}
-  .brand{font-size:21px}
-  .card strong{font-size:17px}
-}
-</style>
-</head>
-
-<body>
-<div class="wrap">
-
-<header class="header">
-  <div>
-    <div class="brand">♛ SULTAN GOLD PRO</div>
-    <div class="subtitle">INTELLIGENT MULTI-MARKET SIGNALS | H1 + M15</div>
-  </div>
-  <a href="index.html">↗ العودة للرئيسية</a>
-</header>
-
-<section class="panel">
-  <h2>البحث الذكي عن الأسواق</h2>
-
-  <form id="searchForm" class="searchbar">
-    <input
-      id="symbolInput"
-      type="text"
-      value="XAU/USD"
-      placeholder="اكتب الرمز مثل TSLA أو EUR/USD"
-      aria-label="رمز السوق"
-      autocomplete="off"
-      spellcheck="false"
-      required
-    >
-    <button class="primary" type="submit">⌕ عرض السوق</button>
-  </form>
-
-  <div class="quick" id="quickMarkets">
-    <button type="button" data-symbol="XAU/USD">🥇 الذهب</button>
-    <button type="button" data-symbol="XAG/USD">🥈 الفضة</button>
-    <button type="button" data-symbol="EUR/USD">🇪🇺 EURUSD</button>
-    <button type="button" data-symbol="GBP/USD">🇬🇧 GBPUSD</button>
-    <button type="button" data-symbol="TSLA">🚘 TSLA</button>
-    <button type="button" data-symbol="AAPL">🍎 AAPL</button>
-    <button type="button" data-symbol="NVDA">📊 NVDA</button>
-    <button type="button" data-symbol="BTC/USD">₿ Bitcoin</button>
-    <button type="button" data-symbol="ETH/USD">◇ Ethereum</button>
-  </div>
-
-  <div class="info">
-    يمكنك البحث عن رموز أخرى. ظهور بيانات السوق يعتمد على
-    تغطية Twelve Data وصلاحيات اشتراك البيانات.
-  </div>
-</section>
-
-<section class="panel">
-  <div class="controls">
-    <strong class="symbol-name" id="marketName">الذهب XAU/USD</strong>
-
-    <select id="timeframe" aria-label="الإطار الزمني">
-      <option value="15min">M15 — الدخول</option>
-      <option value="1h">H1 — الاتجاه</option>
-    </select>
-
-    <button id="refresh" type="button">تحديث البيانات</button>
-  </div>
-
-  <div id="status" class="status">بانتظار بيانات السوق.</div>
-  <div id="lastUpdate" class="info"></div>
-  <div id="chart" class="chart"></div>
-</section>
-
-<section class="grid">
-  <div class="card">
-    <small>آخر إشارة مؤكدة</small>
-    <strong id="signal" class="wait">WAIT</strong>
-  </div>
-
-  <div class="card">
-    <small>ENTRY</small>
-    <strong id="entry">—</strong>
-  </div>
-
-  <div class="card">
-    <small>STOP LOSS</small>
-    <strong id="sl">—</strong>
-  </div>
-
-  <div class="card">
-    <small>TP1</small>
-    <strong id="tp1">—</strong>
-  </div>
-
-  <div class="card">
-    <small>TP2 / TP3</small>
-    <strong id="tp23">—</strong>
-  </div>
-</section>
-
-<section class="panel note">
-  <strong>منهج SULTAN GOLD PRO:</strong>
-  تحديد اتجاه H1 باستخدام EMA 9 وEMA 21،
-  والبحث عن تقاطع مؤكد على M15 في الاتجاه نفسه.
-  وقف الخسارة يحسب باستخدام ATR 14 والقمة أو القاع القريب،
-  والأهداف 1R و2R و3R.
-
-  <p>
-    الإشارة المعروضة تاريخية، ولا تعني وجود فرصة دخول حالية.
-    لا تُستخدم الإشارات دون التحقق من السعر الحالي والسيولة
-    والسبريد وأوقات السوق.
-  </p>
-
-  <p>
-    المحتوى تعليمي وليس توصية مالية أو ضمانًا لتحقيق الأرباح.
-  </p>
-</section>
-
-<div class="footer">
-  SULTAN GOLD PRO | سلطان الزهراني
-  <p>
-    <a href="https://t.me/sultanGold0"
-       target="_blank" rel="noopener noreferrer">
-      قناة SULTAN GOLD على تيليجرام
-    </a>
-  </p>
-  اصنع لنفسك مدرسة
-</div>
-
-</div>
-
-<script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
-
-<script>
-'use strict';
-
-const API_URL='/.netlify/functions/candles';
-const el=id=>document.getElementById(id);
-
-let currentSymbol='XAU/USD';
-let chart=null;
-let candleSeries=null;
-let ema9Series=null;
-let ema21Series=null;
-let requestId=0;
-
-const MARKET_NAMES={
-  'XAU/USD':'الذهب XAU/USD',
-  'XAG/USD':'الفضة XAG/USD',
-  'EUR/USD':'اليورو دولار EUR/USD',
-  'GBP/USD':'الجنيه دولار GBP/USD',
-  'USD/JPY':'الدولار ين USD/JPY',
-  'TSLA':'Tesla | TSLA',
-  'AAPL':'Apple | AAPL',
-  'NVDA':'NVIDIA | NVDA',
-  'MSFT':'Microsoft | MSFT',
-  'BTC/USD':'Bitcoin | BTC/USD',
-  'ETH/USD':'Ethereum | ETH/USD',
-  'WTI':'النفط WTI'
-};
-
-function marketSymbol(value){
-  let s=String(value||'').trim().toUpperCase()
-    .replace(/\s+/g,'').replace(/\\/g,'/');
-
-  const aliases={
-    GOLD:'XAU/USD',
-    XAUUSD:'XAU/USD',
-    SILVER:'XAG/USD',
-    XAGUSD:'XAG/USD',
-    EURUSD:'EUR/USD',
-    GBPUSD:'GBP/USD',
-    USDJPY:'USD/JPY',
-    BTCUSD:'BTC/USD',
-    ETHUSD:'ETH/USD',
-    BITCOIN:'BTC/USD',
-    ETHEREUM:'ETH/USD'
-  };
-
-  return aliases[s]||s;
-}
-
-function decimals(symbol){
-  if(symbol==='USD/JPY')return 3;
-  if(symbol.includes('BTC'))return 2;
-  if(symbol.includes('ETH'))return 2;
-  if(symbol==='XAU/USD'||symbol==='XAG/USD')return 2;
-  if(symbol.includes('/'))return 5;
-  return 2;
-}
-
-function fmt(n){
-  return Number(n).toFixed(decimals(currentSymbol));
-}
-
-function status(message){
-  el('status').textContent=message;
-}
-
-function reset(){
-  el('signal').textContent='WAIT';
-  el('signal').className='wait';
-
-  for(const id of ['entry','sl','tp1','tp23']){
-    el(id).textContent='—';
-  }
-}
-
-function ema(values,period){
-  const result=[];
-  let last=null;
-  const k=2/(period+1);
-
-  for(const value of values){
-    last=last===null?value:(value*k+last*(1-k));
-    result.push(last);
-  }
-  return result;
-}
-
-function atr(candles,period=14){
-  const out=[];
-  let avg=0;
-
-  for(let i=0;i<candles.length;i++){
-    const c=candles[i];
-    const prev=i?candles[i-1].close:c.close;
-    const tr=Math.max(
-      c.high-c.low,
-      Math.abs(c.high-prev),
-      Math.abs(c.low-prev)
-    );
-
-    if(i<period){
-      avg+=tr;
-      out.push(i===period-1?avg/period:null);
-      if(i===period-1)avg/=period;
-    }else{
-      avg=(avg*(period-1)+tr)/period;
-      out.push(avg);
-    }
-  }
-  return out;
-}
-
-/* Convert exchange-local candle datetime to UTC.
-   This avoids assuming that all markets use UTC. */
-function localToUnix(datetime,timezone){
-  if(typeof datetime!=='string'){
-    throw Error('توقيت الشمعة غير موجود');
-  }
-
-  const s=datetime.trim().replace(' ','T');
-
-  if(/[zZ]$|[+-]\d{2}:\d{2}$/.test(s)){
-    const parsed=Date.parse(s);
-    if(!Number.isFinite(parsed))throw Error('توقيت غير صالح');
-    return Math.floor(parsed/1000);
-  }
-
-  const match=s.match(
-    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/
-  );
-  if(!match)throw Error('تنسيق توقيت غير صالح');
-
-  const parts=match.slice(1).map(Number);
-  const [y,mo,d,h,mi,se=0]=parts;
-
-  const nominal=Date.UTC(y,mo-1,d,h,mi,se);
-  const tz=timezone||'UTC';
-
-  if(tz==='UTC')return Math.floor(nominal/1000);
-
-  const formatter=new Intl.DateTimeFormat('en-US',{
-    timeZone:tz,
-    year:'numeric',month:'2-digit',day:'2-digit',
-    hour:'2-digit',minute:'2-digit',second:'2-digit',
-    hourCycle:'h23'
-  });
-
-  let timestamp=nominal;
-
-  for(let attempt=0;attempt<3;attempt++){
-    const p={};
-    for(const part of formatter.formatToParts(new Date(timestamp))){
-      if(part.type!=='literal')p[part.type]=Number(part.value);
-    }
-    const interpreted=Date.UTC(
-      p.year,p.month-1,p.day,
-      p.hour,p.minute,p.second
-    );
-    const delta=nominal-interpreted;
-    timestamp+=delta;
-    if(delta===0)break;
-  }
-
-  return Math.floor(timestamp/1000);
-}
-
-function normalize(raw,timezone){
-  if(!Array.isArray(raw)){
-    throw Error('صيغة بيانات الشموع غير صحيحة');
-  }
-
-  const data=raw.map(c=>{
-    let time;
-
-    if(c.datetime){
-      time=localToUnix(c.datetime,timezone);
-    }else{
-      time=Number(c.time);
-      if(time>1e12)time=Math.floor(time/1000);
-    }
-
-    const x={
-      time,
-      open:Number(c.open),
-      high:Number(c.high),
-      low:Number(c.low),
-      close:Number(c.close)
-    };
-
-    if(
-      !Object.values(x).every(Number.isFinite)||
-      x.time<=0||
-      x.high<Math.max(x.open,x.close)||
-      x.low>Math.min(x.open,x.close)||
-      x.low>x.high
-    ){
-      throw Error('بيانات شموع غير صالحة');
-    }
-
-    return x;
-  });
-
-  data.sort((a,b)=>a.time-b.time);
-
-  for(let i=1;i<data.length;i++){
-    if(data[i].time<=data[i-1].time){
-      throw Error('تكرار أو ترتيب غير صحيح للشموع');
-    }
-  }
-
-  return data;
-}
-
-async function getCandles(symbol,interval){
-  const params=new URLSearchParams({
-    symbol,
-    interval,
-    limit:'300'
-  });
-
-  const response=await fetch(
-    `${API_URL}?${params.toString()}`,
-    {cache:'no-store'}
-  );
-
-  let body;
-  try{
-    body=await response.json();
-  }catch{
-    throw Error(`استجابة الخادم غير صالحة (${response.status})`);
-  }
-
-  if(!response.ok||body.success===false){
-    throw Error(
-      body.error||
-      body.message||
-      `تعذر تحميل البيانات (${response.status})`
-    );
-  }
-
-  if(!Array.isArray(body.candles)){
-    throw Error('الخادم لم يرجع شموعًا صالحة');
-  }
-
-  return normalize(body.candles,body.timezone||'UTC');
-}
-
-function destroyChart(){
-  if(chart){
-    chart.remove();
-    chart=null;
-  }
-  candleSeries=null;
-  ema9Series=null;
-  ema21Series=null;
-}
-
-function createChart(){
-  if(typeof LightweightCharts==='undefined'){
-    throw Error('تعذر تحميل مكتبة الشارت');
-  }
-
-  destroyChart();
-
-  chart=LightweightCharts.createChart(el('chart'),{
-    width:el('chart').clientWidth,
-    height:el('chart').clientHeight,
-    layout:{
-      background:{color:'#071d35'},
-      textColor:'#b8d8ee'
-    },
-    grid:{
-      vertLines:{color:'#15334d'},
-      horzLines:{color:'#15334d'}
-    },
-    timeScale:{
-      timeVisible:true,
-      secondsVisible:false
-    },
-    rightPriceScale:{
-      borderColor:'#24527b'
-    }
-  });
-
-  candleSeries=chart.addCandlestickSeries({
-    upColor:'#19d9ac',
-    downColor:'#ff6675',
-    borderVisible:false,
-    wickUpColor:'#19d9ac',
-    wickDownColor:'#ff6675'
-  });
-
-  ema9Series=chart.addLineSeries({
-    color:'#23c9ff',
-    lineWidth:2,
-    title:'EMA 9'
-  });
-
-  ema21Series=chart.addLineSeries({
-    color:'#e6b961',
-    lineWidth:2,
-    title:'EMA 21'
-  });
-}
-
 function lastConfirmedSignal(m15,h1){
   if(m15.length<50||h1.length<30)return null;
 
@@ -587,280 +5,108 @@ function lastConfirmedSignal(m15,h1){
   const ms=ema(m15.map(c=>c.close),21);
   const hf=ema(h1.map(c=>c.close),9);
   const hs=ema(h1.map(c=>c.close),21);
-  const ranges=atr(m15,14);
+
+  const atr15=atr(m15,14);
+  const atrH1=atr(h1,14);
 
   let j=0;
   let last=null;
 
-  /* Exclude the final candle, which may still be forming. */
+  // تجاهل آخر شمعة غير مؤكدة
   for(let i=22;i<m15.length-1;i++){
     const t=m15[i].time;
 
-    /* Use only H1 candles closed before M15 signal close. */
+    // استخدام شموع الساعة المغلقة فقط
     while(
       j+1<h1.length-1 &&
       h1[j+1].time+3600<=t+900
-    )j++;
+    ){
+      j++;
+    }
 
     if(h1[j].time+3600>t+900)continue;
 
     const buy=
-      mf[i]>ms[i]&&
-      mf[i-1]<=ms[i-1]&&
+      mf[i]>ms[i] &&
+      mf[i-1]<=ms[i-1] &&
       hf[j]>hs[j];
 
     const sell=
-      mf[i]<ms[i]&&
-      mf[i-1]>=ms[i-1]&&
+      mf[i]<ms[i] &&
+      mf[i-1]>=ms[i-1] &&
       hf[j]<hs[j];
 
-    if(!(buy||sell)||!(ranges[i]>0))continue;
+    if(!buy&&!sell)continue;
+
+    const a15=atr15[i];
+    const aH1=atrH1[j];
+
+    if(
+      !Number.isFinite(a15)||
+      !Number.isFinite(aH1)||
+      a15<=0||
+      aH1<=0
+    )continue;
 
     const side=buy?'BUY':'SELL';
     const dir=buy?1:-1;
     const entry=m15[i].close;
 
-    const recent=m15.slice(Math.max(0,i-10),i+1);
-    const swingLow=Math.min(...recent.map(c=>c.low));
-    const swingHigh=Math.max(...recent.map(c=>c.high));
+    // القمة والقاع خلال آخر 10 شموع M15
+    const recent=m15.slice(
+      Math.max(0,i-9),i+1
+    );
 
-    const atrRisk=ranges[i]*1.5;
-    const buffer=ranges[i]*0.25;
+    const swingLow=Math.min(
+      ...recent.map(c=>c.low)
+    );
 
-    let sl;
+    const swingHigh=Math.max(
+      ...recent.map(c=>c.high)
+    );
 
-    if(buy){
-      sl=Math.min(entry-atrRisk,swingLow-buffer);
-    }else{
-      sl=Math.max(entry+atrRisk,swingHigh+buffer);
-    }
+    // حد أدنى للمسافة مبني على تقلب الإطارين
+    const minimumRisk=Math.max(
+      a15*2,
+      aH1*0.85
+    );
 
-    const risk=Math.abs(entry-sl);
-    if(!Number.isFinite(risk)||risk<=0)continue;
+    // هامش خلف القمة أو القاع
+    const buffer=a15*0.25;
+
+    const swingStop=buy
+      ?swingLow-buffer
+      :swingHigh+buffer;
+
+    const swingRisk=buy
+      ?entry-swingStop
+      :swingStop-entry;
+
+    const risk=Math.max(
+      minimumRisk,
+      swingRisk
+    );
+
+    // تجاهل القيم غير الصالحة
+    if(
+      !Number.isFinite(risk)||
+      risk<=0
+    )continue;
+
+    const sl=entry-dir*risk;
 
     last={
       side,
       entry,
       sl,
       tp1:entry+dir*risk,
-      tp2:entry+dir*2*risk,
-      tp3:entry+dir*3*risk,
+      tp2:entry+dir*risk*2,
+      tp3:entry+dir*risk*3,
       time:t,
       risk,
-      atr:ranges[i]
+      atr:a15
     };
   }
 
   return last;
 }
-
-function show(result){
-  reset();
-  if(!result)return;
-
-  el('signal').textContent=result.side;
-  el('signal').className=
-    result.side==='BUY'?'buy':'sell';
-
-  el('entry').textContent=fmt(result.entry);
-  el('sl').textContent=fmt(result.sl);
-  el('tp1').textContent=fmt(result.tp1);
-  el('tp23').textContent=
-    `${fmt(result.tp2)} / ${fmt(result.tp3)}`;
-}
-
-function addLevels(result){
-  if(!result||!candleSeries)return;
-
-  const values=[
-    ['ENTRY',result.entry,'#23c9ff'],
-    ['SL',result.sl,'#ff6675'],
-    ['TP1',result.tp1,'#19d9ac'],
-    ['TP2',result.tp2,'#19d9ac'],
-    ['TP3',result.tp3,'#19d9ac']
-  ];
-
-  values.forEach(([name,price,color])=>{
-    candleSeries.createPriceLine({
-      price,
-      color,
-      lineWidth:name==='ENTRY'?2:1,
-      lineStyle:LightweightCharts.LineStyle.Dashed,
-      axisLabelVisible:true,
-      title:`${name} ${fmt(price)}`
-    });
-  });
-}
-
-function displayName(symbol){
-  return MARKET_NAMES[symbol]||symbol;
-}
-
-function updateQuickButtons(){
-  document.querySelectorAll('[data-symbol]').forEach(button=>{
-    button.classList.toggle(
-      'active',
-      button.dataset.symbol===currentSymbol
-    );
-  });
-}
-
-function isCrypto(symbol){
-  return /^(BTC|ETH|SOL|XRP|ADA)[/-]/.test(symbol);
-}
-
-function freshness(candles,symbol){
-  const last=candles[candles.length-1];
-  const age=Math.max(0,Date.now()/1000-last.time);
-  const hours=Math.floor(age/3600);
-
-  /* Weekend/holiday gaps are possible outside crypto markets. */
-  const threshold=isCrypto(symbol)?3:72;
-
-  return {
-    hours,
-    delayed:hours>threshold,
-    date:new Date(last.time*1000).toLocaleString('ar-SA',{
-      timeZone:'Asia/Riyadh',
-      dateStyle:'medium',
-      timeStyle:'short'
-    })
-  };
-}
-
-async function load(){
-  const id=++requestId;
-  const symbol=currentSymbol;
-
-  reset();
-  destroyChart();
-  el('lastUpdate').textContent='';
-  status(`جارٍ تحميل بيانات ${symbol}...`);
-
-  const button=el('refresh');
-  button.disabled=true;
-
-  try{
-    const [m15,h1]=await Promise.all([
-      getCandles(symbol,'15min'),
-      getCandles(symbol,'1h')
-    ]);
-
-    if(id!==requestId)return;
-
-    if(m15.length<50||h1.length<30){
-      throw Error(
-        'عدد الشموع غير كافٍ لحساب إشارة H1 + M15'
-      );
-    }
-
-    const tf=el('timeframe').value;
-    const candles=tf==='1h'?h1:m15;
-
-    createChart();
-    candleSeries.setData(candles);
-
-    const closingPrices=candles.map(c=>c.close);
-    const fast=ema(closingPrices,9);
-    const slow=ema(closingPrices,21);
-
-    ema9Series.setData(candles.map((c,i)=>({
-      time:c.time,
-      value:fast[i]
-    })));
-
-    ema21Series.setData(candles.map((c,i)=>({
-      time:c.time,
-      value:slow[i]
-    })));
-
-    const result=lastConfirmedSignal(m15,h1);
-    const fresh=freshness(m15,symbol);
-
-    if(result){
-      addLevels(result);
-
-      if(tf==='15min'&&result.time){
-        candleSeries.setMarkers([{
-          time:result.time,
-          position:result.side==='BUY'?'belowBar':'aboveBar',
-          color:result.side==='BUY'?'#19d9ac':'#ff6675',
-          shape:result.side==='BUY'?'arrowUp':'arrowDown',
-          text:result.side
-        }]);
-      }
-    }
-
-    show(result);
-    chart.timeScale().fitContent();
-
-    el('lastUpdate').textContent=
-      `آخر شمعة مستلمة بتوقيت السعودية: ${fresh.date}`;
-
-    let message=result
-      ?`آخر إشارة تاريخية مؤكدة: ${result.side}. مستوياتها ليست أمر دخول حاليًا.`
-      :'تم تحميل الشموع. لا توجد إشارة مؤكدة ضمن البيانات المتاحة.';
-
-    if(fresh.delayed){
-      message+=
-        `\nتنبيه: أحدث البيانات المتاحة عمرها نحو ${fresh.hours} ساعة. تحقق من جلسة السوق وحداثة الأسعار.`;
-    }
-
-    status(message);
-
-  }catch(error){
-    if(id!==requestId)return;
-    reset();
-    destroyChart();
-    status('تعذر تحميل السوق: '+error.message);
-  }finally{
-    if(id===requestId)button.disabled=false;
-  }
-}
-
-function selectMarket(raw){
-  const symbol=marketSymbol(raw);
-
-  if(!symbol||symbol.length>40||
-     !/^[A-Z0-9/._:-]+$/.test(symbol)){
-    status('اكتب رمز سوق صحيحًا بالإنجليزية.');
-    return;
-  }
-
-  currentSymbol=symbol;
-  el('symbolInput').value=symbol;
-  el('marketName').textContent=displayName(symbol);
-  updateQuickButtons();
-  load();
-}
-
-el('searchForm').addEventListener('submit',event=>{
-  event.preventDefault();
-  selectMarket(el('symbolInput').value);
-});
-
-document.querySelectorAll('[data-symbol]').forEach(button=>{
-  button.addEventListener('click',()=>{
-    selectMarket(button.dataset.symbol);
-  });
-});
-
-el('refresh').addEventListener('click',load);
-el('timeframe').addEventListener('change',load);
-
-window.addEventListener('resize',()=>{
-  if(chart){
-    chart.applyOptions({
-      width:el('chart').clientWidth,
-      height:el('chart').clientHeight
-    });
-  }
-});
-
-reset();
-updateQuickButtons();
-load();
-
-</script>
-</body>
-</html>
