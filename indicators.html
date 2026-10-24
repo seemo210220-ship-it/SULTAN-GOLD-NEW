@@ -12,11 +12,9 @@ function lastConfirmedSignal(m15,h1){
   let j=0;
   let last=null;
 
-  // تجاهل آخر شمعة غير مؤكدة
   for(let i=22;i<m15.length-1;i++){
     const t=m15[i].time;
 
-    // استخدام شموع الساعة المغلقة فقط
     while(
       j+1<h1.length-1 &&
       h1[j+1].time+3600<=t+900
@@ -52,10 +50,7 @@ function lastConfirmedSignal(m15,h1){
     const dir=buy?1:-1;
     const entry=m15[i].close;
 
-    // القمة والقاع خلال آخر 10 شموع M15
-    const recent=m15.slice(
-      Math.max(0,i-9),i+1
-    );
+    const recent=m15.slice(Math.max(0,i-9),i+1);
 
     const swingLow=Math.min(
       ...recent.map(c=>c.low)
@@ -65,13 +60,11 @@ function lastConfirmedSignal(m15,h1){
       ...recent.map(c=>c.high)
     );
 
-    // حد أدنى للمسافة مبني على تقلب الإطارين
     const minimumRisk=Math.max(
       a15*2,
       aH1*0.85
     );
 
-    // هامش خلف القمة أو القاع
     const buffer=a15*0.25;
 
     const swingStop=buy
@@ -82,16 +75,9 @@ function lastConfirmedSignal(m15,h1){
       ?entry-swingStop
       :swingStop-entry;
 
-    const risk=Math.max(
-      minimumRisk,
-      swingRisk
-    );
+    const risk=Math.max(minimumRisk,swingRisk);
 
-    // تجاهل القيم غير الصالحة
-    if(
-      !Number.isFinite(risk)||
-      risk<=0
-    )continue;
+    if(!Number.isFinite(risk)||risk<=0)continue;
 
     const sl=entry-dir*risk;
 
