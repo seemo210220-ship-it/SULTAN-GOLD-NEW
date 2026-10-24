@@ -179,7 +179,7 @@ return data;
 
 async function getCandles(tf){
 const res=await fetch(
-`${API_URL}?symbol=XAUUSD&interval=${encodeURIComponent(tf)}`,
+`${API_URL}?symbol=XAU%2FUSD&interval=${encodeURIComponent(tf)}`,
 {cache:'no-store'}
 );
 let body;
