@@ -348,7 +348,7 @@ status('جارٍ طلب بيانات السوق...');
 
 try{
 const [m15,h1]=await Promise.all([
-getCandles('15m'),
+getCandles('15min'),
 getCandles('1h')
 ]);
 
